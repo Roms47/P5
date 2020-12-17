@@ -1,5 +1,5 @@
 import mysql.connector # mysql-connector-python
-from import_bd.mdp_mysql import *
+from mdp_mysql import *
 
 
 def reset():
@@ -35,4 +35,4 @@ def reset():
                      REFERENCES Categories(id_categorie)")
     mycursor.execute("ALTER TABLE Favoris "
                      "ADD CONSTRAINT fk_produits FOREIGN KEY (produit) \
-                     REFERENCES Produits(id_produits)"
+                     REFERENCES Produits(id_produits)")

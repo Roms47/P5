@@ -23,7 +23,7 @@ class Category:
         print(self.nombre_pages)
         print(self.adresse)
 
-    def get_api_categories(self):
+    def get_api_categories():
         """ Get the categories from the official API """
 
         r = requests.get("https://fr.openfoodfacts.org/categories.json")
