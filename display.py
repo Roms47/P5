@@ -1,7 +1,7 @@
 from termcolor import colored
 
 class Display:
-    """Classe qui gère les affichages"""
+    """Class that manages displays"""
     def __init__(self):
         pass
 
@@ -31,7 +31,7 @@ class Display:
         return choix
 
     def afficher_produit(self, produit):
-        """ Affiche les informations d'un produit"""
+        """ Displays product information"""
 
         print(colored("-------------------------------------------", 'magenta'))
         print(

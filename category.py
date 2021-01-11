@@ -23,7 +23,7 @@ class Category:
         print(self.nombre_pages)
         print(self.adresse)
 
-    def get_api_categories():
+    def get_api_categories(self):
         """ Get the categories from the official API """
 
         r = requests.get("https://fr.openfoodfacts.org/categories.json")
@@ -32,8 +32,3 @@ class Category:
         print(" {} category on the site.\n").format(nombre_categories)
         # Environs 12 800 catÃ©gories. Je vais commencer par en prendre une dizaine.
         return categories
-        
-
-
-
-

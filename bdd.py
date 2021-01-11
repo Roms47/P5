@@ -2,10 +2,10 @@ import mysql.connector
 from mdp_mysql import *
 
 class Database:
-    """ Classe d'interaction avec la BDD"""
+    """ BDD Interaction Class"""
 
     def __init__(self):
-        """Constructeur de la class Database"""
+        """Builder of the Database class"""
         self.mydb = mysql.connector.connect(
             host="localhost",
             user="root",
@@ -14,18 +14,17 @@ class Database:
         )
         self.mycursor = self.mydb.cursor()
 
-    ##############################################################
-    #                       Insertion  des données               #
-    ##############################################################
+    #   Insert data   #
+    
     def set_categorie(self, categorie):
-        """enregistre les catégories en BDD"""
+        """saves categories in DB"""
         sql = """INSERT INTO Categories(nom) VALUES (%s)"""
         val = (categorie.name,)
         self.mycursor.execute(sql, val)
         self.mydb.commit()
 
     def set_product(self, produit):
-        """Méthode qui ajoute un produit dans la base"""
+        """Method that adds a product to the base"""
         sql = """INSERT INTO Produits(id_produits, url, nom, grade, categorie, magasin, image) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         val = (
             produit.code_barre,
@@ -41,44 +40,42 @@ class Database:
         print(self.mycursor.rowcount)
 
     def set_favoris(self, produit):
-        """Méthode qui ajoute un produit dans la base"""
+        """Method that adds a favorites to the base"""
         sql = """INSERT INTO Favoris(produit)\
                 VALUES (%s)"""
         val = (produit.code_barre,)
         self.mycursor.execute(sql, val)
         self.mydb.commit()
 
-    ##############################################################
-    #                       Selection  des données               #
-    ##############################################################
+    #   Data selection   #
 
     def get_all_categorie(self):
-        """ Méthode qui retourne l'ensemble des catégories en BDD"""
+        """ Method that returns the set of categories in BDD"""
         self.mycursor.execute("SELECT * FROM Categories")
         return self.mycursor.fetchall()
 
     def print_all_categories(self):
-        """affiche toutes les catégories"""
+        """display all categories"""
         liste = self.get_all_categorie()
         for i in range(len(liste)):
             print(liste[i][0], ".\t", liste[i][1])
 
     def get_product_from_categorie(self, id):
-        """ Méthode qui retourne l'ensemble des produits de la catégorie id"""
+        """ Method that returns the set of products of the category id"""
         sql = """SELECT * FROM Produits WHERE categorie = (%s)"""
         val = (id,)
         self.mycursor.execute(sql, val)
         return self.mycursor.fetchall()
 
     def print_product_from_categorie(self, id):
-        """Affiche les produits d'une catégorie donnée"""
+        """Displays products in a given category"""
         liste = self.get_product_from_categorie(id)
         for i in range(len(liste)):
             print(i + 1, ".\t", liste[i][2], "(", liste[i][3], ")")
         return liste
 
     def get_all_favoris(self):
-        """ Méthode qui retourne l'ensemble des favoris en BDD"""
+        """ Method that returns the set of favorites to BDD"""
         sql = """SELECT *
                 FROM Produits 
                 INNER JOIN Favoris ON Produits.id_produits = Favoris.produit"""
@@ -86,14 +83,13 @@ class Database:
         return self.mycursor.fetchall()
 
     def print_all_favoris(self):
-        """Permet d'afficher tous les favoris"""
+        """Displays all favorites"""
         liste = self.get_all_favoris()
         for i in range(len(liste)):
             print(i + 1, ".\t", liste[i][2], "(", liste[i][3], ")")
 
     def search_substitut(self, cat, grade):
-        """Retourne LES produits de catégorie cat
-         avec une notre mieux que grade classé par ordre de grade"""
+        """Returns the products of category cat classified by order of grade"""
         sql = """SELECT * 
                 FROM Produits 
                 WHERE categorie = (%s) AND grade <= (%s)

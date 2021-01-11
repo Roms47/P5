@@ -7,7 +7,7 @@ from mdp_mysql import *
 from display import Display
 
 def main():
-    url_de_base = "https://fr.openfoodfacts.org/categorie/"  # on rajoute produit/i.json
+    url_de_base = "https://fr.openfoodfacts.org/categorie/"  # we add product/i.json
     nb_produit = LIMITE_PAGES
     total_produit = 0
     total_charge = 0
@@ -19,11 +19,11 @@ def main():
     menu = True
     if choix == 1:
         reset()
-        # L'appel à l'API ne doit se faire que à la première utilisation
+        # The API should only be called the first time it is used.
         instance = Database()
         categories = Category.get_api_categories()
         nombre_a_afficher = int(input("Combien de categories voulez vous charger ?"))
-        # Je commence par nombre de produit par catégorie
+        # I start with number of products per category
         for i in range(1, nombre_a_afficher +1):
             categorie = Category(
                 categories["tags"][i].get("name"),
@@ -63,7 +63,7 @@ def main():
         )
     elif choix == 0:
         menu = False
-    ### Dans le cas où la base est déjà crée.
+    ### If the base is already created.
 
     instance = Database()
     menu_accueil = True
@@ -99,7 +99,7 @@ def main():
                 liste[n][6],
             )
             affichage.afficher_produit(substitut)
-            choix = input("Souhaitez vous le sauvgarder ? O/N\n").upper()
+            choix = input("Souhaitez vous le sauvegarder ? O/N\n").upper()
             if choix == "O":
                 instance.set_favoris(substitut)
             elif choix == "N":

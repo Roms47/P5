@@ -12,9 +12,9 @@ def reset():
     mycursor.execute("DROP DATABASE IF exists mydatabase")
     mycursor.execute("CREATE DATABASE IF NOT exists mydatabase")
     mycursor.execute("USE mydatabase")
-    ##############################################################
-    #                      Création des tables                   #
-    ##############################################################
+   
+    #    Creating the tables    #
+
     mycursor.execute("CREATE TABLE IF NOT exists Categories("
                     "id_categorie INT NOT NULL AUTO_INCREMENT,"
                           " nom VARCHAR(255)," 
@@ -27,9 +27,9 @@ def reset():
                      "categorie INT, magasin VARCHAR(255), image VARCHAR(255),"
                     "PRIMARY KEY (id_produits)) ENGINE=InnoDB")
     mycursor.execute("CREATE TABLE IF NOT exists Favoris(produit VARCHAR(255))")
-    ##############################################################
-    #                    Modification des tables                 #
-    ##############################################################
+
+    #    Editing tables    #
+
     mycursor.execute("ALTER TABLE Produits "
                      "ADD CONSTRAINT fk_categories FOREIGN KEY (categorie) \
                      REFERENCES Categories(id_categorie)")
