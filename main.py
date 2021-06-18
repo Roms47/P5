@@ -1,13 +1,14 @@
-from bdd import Database
-from category import Category
-from products import Product
-from reset_bdd import *
+from data.bdd import *
+from modele.products import Product
+from modele.category import Category
+from vue.display import Display
+from data import reset_bdd
 from random import *
-from mdp_mysql import *
-from display import Display
+from config import *
 
 def main():
-    url_de_base = "https://fr.openfoodfacts.org/categorie/"  # we add product/i.json
+
+    url_de_base = "https://fr.openfoodfacts.org/categorie/"  # add produit/i.json
     nb_produit = LIMITE_PAGES
     total_produit = 0
     total_charge = 0
@@ -18,44 +19,46 @@ def main():
 
     menu = True
     if choix == 1:
-        reset()
-        # The API should only be called the first time it is used.
+        resetBDD.reset()
+        # The API should only be called on first use
         instance = Database()
         categories = Category.get_api_categories()
-        nombre_a_afficher = int(input("Combien de categories voulez vous charger ?"))
-        # I start with number of products per category
+        nombre_a_afficher = int(input("How many categories do you want to charge ? "))
+        # I start with the number of products per category
         for i in range(1, nombre_a_afficher +1):
             categorie = Category(
                 categories["tags"][i].get("name"),
-                categories["tags"][i].get("nb"),
-                categories["tags"][i].get("adresse"),
+                categories["tags"][i].get("products"),
                 categories["tags"][i].get("id"),
-                i)
+                categories["tags"][i].get("url"),
+                i,
+            )
             categorie.afficher_categorie()
             total_produit += categorie.nb_product
             instance.set_categorie(categorie)
             for page in range(1, nb_produit + 1):
-                produits = Product.get_api_products(page)
+                produits = categorie.get_api_products(page)
                 for k in range(20):
                     total_analyse += 1
                     try:
                         produit = Product(
-                            produits["products"][k].get("product_name", colored("XXX", 'red')),
-                            produits["products"][k].get("url", colored("url absente", 'red')),
+                            produits["products"][k].get("product_name", "XXX"),
+                            produits["products"][k].get("url", "url absente"),
                             produits["products"][k].get("nutrition_grade_fr", "E"),
                             produits["products"][k].get("id", "ID absent"),
                             i,
-                            produits["products"][k].get("stores", colored("Information manquante", 'red')),
-                            produits["products"][k].get("image_url", colored("Information manquante", 'red')),
-                        )
+                            produits["products"][k].get("stores", "Information manquante"),
+                            produits["products"][k].get("image_url", "Information manquante")
                         affichage.afficher_produit(produit)
                         try:
                             instance.set_product(produit)
                             total_charge += 1
                         except:
-                            print("produit ignoré cause BDD")
+                            print(" produit ignoré cause BDD ")
                     except:
-                        print("Produit ignoré pour cause d'information essentielle manquante")
+                        print(
+                            colored("Produit ignoré pour cause d'information essentielle manquante", 'red')
+                        )
         print(
             "\n Ces {} catégories contiennent {} produits dont {} ont été analysé et {} retenus".format(
                 nombre_a_afficher, total_produit, total_analyse, total_charge
@@ -63,7 +66,7 @@ def main():
         )
     elif choix == 0:
         menu = False
-    ### If the base is already created.
+    ### If the database is already created.
 
     instance = Database()
     menu_accueil = True
@@ -99,13 +102,13 @@ def main():
                 liste[n][6],
             )
             affichage.afficher_produit(substitut)
-            choix = input("Souhaitez vous le sauvegarder ? O/N\n").upper()
+            choix = input("Souhaitez vous le sauvgarder ? O/N\n").upper()
             if choix == "O":
                 instance.set_favoris(substitut)
             elif choix == "N":
                 pass
             else:
-                print("Veuillez recomencer à la produit")
+                print("Veuillez recomencer à la page produit")
                 pass
         elif choix == 2:
             instance.print_all_favoris()

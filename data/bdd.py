@@ -1,30 +1,33 @@
-import mysql.connector
-from mdp_mysql import *
-
+import mysql.connector  # mysql-connector-python
+from config.mdp_mysql import *
+from termcolor import colored
+# Singleton à faire
 class Database:
-    """ BDD Interaction Class"""
+    """ Interaction class with the DataBase """
 
     def __init__(self):
-        """Builder of the Database class"""
+        """ Constructor of class DataBase """
         self.mydb = mysql.connector.connect(
             host="localhost",
             user="root",
             passwd=MDP,
-            database="mydatabase" 
+            database="mydatabase"  # The Base must exist.
+            # auth_plugin='mysql_native_password'
         )
         self.mycursor = self.mydb.cursor()
 
-    #   Insert data   #
-    
+    ##############################################################
+    #                        Insertion of Data                   #
+    ##############################################################
     def set_categorie(self, categorie):
-        """saves categories in DB"""
+        """ Saves categories in DataBase """
         sql = """INSERT INTO Categories(nom) VALUES (%s)"""
         val = (categorie.name,)
         self.mycursor.execute(sql, val)
         self.mydb.commit()
 
     def set_product(self, produit):
-        """Method that adds a product to the base"""
+        """ Add product to the DataBase """
         sql = """INSERT INTO Produits(id_produits, url, nom, grade, categorie, magasin, image) VALUES (%s, %s, %s, %s, %s, %s, %s)"""
         val = (
             produit.code_barre,
@@ -37,45 +40,47 @@ class Database:
         )
         self.mycursor.execute(sql, val)
         self.mydb.commit()
-        print(self.mycursor.rowcount)
+        print(colored(self.mycursor.rowcount, 'red'), colored("record inserted.",'green'))
 
     def set_favoris(self, produit):
-        """Method that adds a favorites to the base"""
+        """ Add a product to favourites """
         sql = """INSERT INTO Favoris(produit)\
                 VALUES (%s)"""
         val = (produit.code_barre,)
         self.mycursor.execute(sql, val)
         self.mydb.commit()
 
-    #   Data selection   #
+    ##############################################################
+    #                         Data selection                     #
+    ##############################################################
 
     def get_all_categorie(self):
-        """ Method that returns the set of categories in BDD"""
+        """ Method that returns the set of categories in DataBase """
         self.mycursor.execute("SELECT * FROM Categories")
         return self.mycursor.fetchall()
 
     def print_all_categories(self):
-        """display all categories"""
+        """ Displays all categories """
         liste = self.get_all_categorie()
         for i in range(len(liste)):
             print(liste[i][0], ".\t", liste[i][1])
 
     def get_product_from_categorie(self, id):
-        """ Method that returns the set of products of the category id"""
+        """ Method that returns the set of products of the category id """
         sql = """SELECT * FROM Produits WHERE categorie = (%s)"""
         val = (id,)
         self.mycursor.execute(sql, val)
         return self.mycursor.fetchall()
 
     def print_product_from_categorie(self, id):
-        """Displays products in a given category"""
+        """ Displays products in a specific category """
         liste = self.get_product_from_categorie(id)
         for i in range(len(liste)):
             print(i + 1, ".\t", liste[i][2], "(", liste[i][3], ")")
         return liste
 
     def get_all_favoris(self):
-        """ Method that returns the set of favorites to BDD"""
+        """ Method that returns the set of favourites in DataBase """
         sql = """SELECT *
                 FROM Produits 
                 INNER JOIN Favoris ON Produits.id_produits = Favoris.produit"""
@@ -83,13 +88,14 @@ class Database:
         return self.mycursor.fetchall()
 
     def print_all_favoris(self):
-        """Displays all favorites"""
+        """ Displays all favourites """
         liste = self.get_all_favoris()
         for i in range(len(liste)):
             print(i + 1, ".\t", liste[i][2], "(", liste[i][3], ")")
 
     def search_substitut(self, cat, grade):
-        """Returns the products of category cat classified by order of grade"""
+        """ Retourne LES produits de catégorie cat
+        avec une notre mieux que grade classé par ordre de grade """
         sql = """SELECT * 
                 FROM Produits 
                 WHERE categorie = (%s) AND grade <= (%s)
